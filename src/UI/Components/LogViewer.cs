@@ -256,10 +256,7 @@ public partial class LogViewer : IKeyBindable, ISearchable
 
     private void ExtendVisualSelectionPageDown(int pageSize)
     {
-        if (_selectedLogicalIndex + pageSize >= _logs.Count - 1)
-            _selectedLogicalIndex = -1;
-        else
-            _selectedLogicalIndex += pageSize;
+        _selectedLogicalIndex = Math.Min(_logs.Count - 1, _selectedLogicalIndex + pageSize);
         _visualSelectionEnd = _selectedLogicalIndex;
     }
 
