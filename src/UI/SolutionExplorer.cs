@@ -36,6 +36,7 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
         editorService.RootPath = _solutionRootPath;
         _root = BuildTree(solution);
         RefreshVisibleNodes();
+        Console.Title = $"lazydotnet | {solution.Name}";
     }
 
     private static ExplorerNode BuildTree(SolutionInfo solution)
