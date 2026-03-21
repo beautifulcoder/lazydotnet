@@ -409,7 +409,7 @@ public partial class LogViewer : IKeyBindable, ISearchable
 
     private IRenderable CreateSelectedRow(PhysicalLine line, bool isActive)
     {
-        var style = isActive ? "black on white" : "black on silver";
+        var style = isActive ? "black on blue" : "black on silver";
         var text = GetDisplayText(line.Text);
         return new Markup($"[{style}]{text}[/]");
     }
