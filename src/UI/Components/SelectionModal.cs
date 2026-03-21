@@ -27,8 +27,7 @@ public class SelectionModal<T> : Modal
                 _options.MoveUp();
                 return Task.CompletedTask;
             },
-            k => k.Key == ConsoleKey.UpArrow ||
-                 k.Key == ConsoleKey.K ||
+            k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } ||
                  k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P },
             ShowInBottomBar: false);
 
@@ -37,8 +36,7 @@ public class SelectionModal<T> : Modal
                 _options.MoveDown();
                 return Task.CompletedTask;
             },
-            k => k.Key == ConsoleKey.DownArrow ||
-                 k.Key == ConsoleKey.J ||
+            k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } ||
                  k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N },
             ShowInBottomBar: false);
 
@@ -47,7 +45,7 @@ public class SelectionModal<T> : Modal
                 _options.PageUp(10);
                 return Task.CompletedTask;
             },
-            k => k.Key == ConsoleKey.PageUp ||
+            k => k is { Key: ConsoleKey.PageUp, Modifiers: 0 } ||
                  k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U },
             ShowInBottomBar: false);
 
@@ -56,7 +54,7 @@ public class SelectionModal<T> : Modal
                 _options.PageDown(10);
                 return Task.CompletedTask;
             },
-            k => k.Key == ConsoleKey.PageDown ||
+            k => k is { Key: ConsoleKey.PageDown, Modifiers: 0 } ||
                  k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D },
             ShowInBottomBar: false);
 
@@ -67,7 +65,7 @@ public class SelectionModal<T> : Modal
 
             await _onSelected(_options.SelectedItem.Value);
             OnClose();
-        }, k => k.Key == ConsoleKey.Enter);
+        }, k => k is { Key: ConsoleKey.Enter, Modifiers: 0 });
     }
 
     public override IRenderable GetRenderable(int width, int height)

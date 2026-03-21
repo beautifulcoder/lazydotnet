@@ -85,7 +85,7 @@ public class ExecutionTab : IProjectTab
                 await ExecutionService.Instance.StartProjectAsync(_currentProjectPath, _currentProjectName);
                 RequestRefresh?.Invoke();
             }
-        }, k => k.KeyChar == 'r');
+        }, k => k is { KeyChar: 'r', Modifiers: 0 });
 
         yield return new KeyBinding("s", "stop project", async () =>
         {
@@ -94,7 +94,7 @@ public class ExecutionTab : IProjectTab
                 await ExecutionService.Instance.StopProjectAsync(_currentProjectPath);
                 RequestRefresh?.Invoke();
             }
-        }, k => k.KeyChar == 's');
+        }, k => k is { KeyChar: 's', Modifiers: 0 });
 
         yield return new KeyBinding("c", "clear logs", () =>
         {
@@ -105,37 +105,37 @@ public class ExecutionTab : IProjectTab
                 RequestRefresh?.Invoke();
             }
             return Task.CompletedTask;
-        }, k => k.KeyChar == 'c');
+        }, k => k is { KeyChar: 'c', Modifiers: 0 });
 
         yield return new KeyBinding("k/↑/ctrl+p", "up", () =>
         {
             MoveUp();
             return Task.CompletedTask;
-        }, k => k.Key is ConsoleKey.UpArrow or ConsoleKey.K || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P }, false);
+        }, k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P }, false);
 
         yield return new KeyBinding("j/↓/ctrl+n", "down", () =>
         {
             MoveDown();
             return Task.CompletedTask;
-        }, k => k.Key is ConsoleKey.DownArrow or ConsoleKey.J || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N }, false);
+        }, k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N }, false);
 
         yield return new KeyBinding("pgup/ctrl+u", "page up", () =>
         {
             PageUp(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageUp || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U }, false);
+        }, k => k is { Key: ConsoleKey.PageUp, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U }, false);
 
         yield return new KeyBinding("pgdn/ctrl+d", "page down", () =>
         {
             PageDown(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageDown || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D }, false);
+        }, k => k is { Key: ConsoleKey.PageDown, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D }, false);
 
         yield return new KeyBinding("esc", "resume stream", () =>
         {
             lock (_lock) { _selectedIndex = -1; }
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.Escape, false);
+        }, k => k is { Key: ConsoleKey.Escape, Modifiers: 0 }, false);
     }
 
     private void MoveUp()

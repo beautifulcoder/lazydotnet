@@ -14,7 +14,7 @@ public class WorkspacePane(SolutionService solutionService, string rootDir) : IK
 
     public IEnumerable<KeyBinding> GetKeyBindings()
     {
-        yield return new KeyBinding("enter", "select workspace", OpenPickerAsync, k => k.Key == ConsoleKey.Enter);
+        yield return new KeyBinding("enter", "select workspace", OpenPickerAsync, k => k is { Key: ConsoleKey.Enter, Modifiers: 0 });
     }
 
     private async Task OpenPickerAsync()

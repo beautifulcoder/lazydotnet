@@ -31,10 +31,10 @@ public class TestDetailsModal(TestNode node, Action onClose) : Modal(node.Name, 
         foreach (var b in base.GetKeyBindings()) yield return b;
 
         yield return new KeyBinding("k", "up", () => { MoveUp(); return Task.CompletedTask; },
-            k => k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.K ||
+            k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } ||
                  k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P }, false);
         yield return new KeyBinding("j", "down", () => { MoveDown(); return Task.CompletedTask; },
-            k => k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.J ||
+            k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } ||
                  k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N }, false);
     }
 

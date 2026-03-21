@@ -28,25 +28,25 @@ public class ProjectPickerModal : Modal
         {
             _projectList.MoveUp();
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.K || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.P), false);
+        }, k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.P), false);
 
         yield return new KeyBinding("j/↓/ctrl+n", "down", () =>
         {
             _projectList.MoveDown();
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.J || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.N), false);
+        }, k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.N), false);
 
         yield return new KeyBinding("pgup/ctrl+u", "page up", () =>
         {
             _projectList.PageUp(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageUp || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.U), false);
+        }, k => k is { Key: ConsoleKey.PageUp, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.U), false);
 
         yield return new KeyBinding("pgdn/ctrl+d", "page down", () =>
         {
             _projectList.PageDown(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageDown || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.D), false);
+        }, k => k is { Key: ConsoleKey.PageDown, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.D), false);
 
         yield return new KeyBinding("enter", "select", async () =>
         {
@@ -54,7 +54,7 @@ public class ProjectPickerModal : Modal
             {
                 await _onSelected(_projectList.SelectedItem);
             }
-        }, k => k.Key == ConsoleKey.Enter);
+        }, k => k is { Key: ConsoleKey.Enter, Modifiers: 0 });
     }
 
     public override IRenderable GetRenderable(int width, int height)

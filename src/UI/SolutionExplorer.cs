@@ -202,39 +202,39 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
         yield return new KeyBinding("pgdn/ctrl+d", "page down", DoPageDown, MatchPageDownKey, false);
         yield return new KeyBinding("h/←", "collapse", DoCollapse, MatchLeftKey, false);
         yield return new KeyBinding("l/→", "expand", DoExpand, MatchRightKey, false);
-        yield return new KeyBinding("enter/space", "toggle", DoToggle, k => k.Key is ConsoleKey.Enter or ConsoleKey.Spacebar, false);
-        yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k.Key == ConsoleKey.E);
-        yield return new KeyBinding("b", "build", DoBuild, k => k.KeyChar == 'b');
-        yield return new KeyBinding("/", "search", DoStartSearch, k => k.KeyChar == '/');
+        yield return new KeyBinding("enter/space", "toggle", DoToggle, k => k is { Key: ConsoleKey.Enter or ConsoleKey.Spacebar, Modifiers: 0 }, false);
+        yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k is { Key: ConsoleKey.E, Modifiers: 0 });
+        yield return new KeyBinding("b", "build", DoBuild, k => k is { KeyChar: 'b', Modifiers: 0 });
+        yield return new KeyBinding("/", "search", DoStartSearch, k => k is { KeyChar: '/', Modifiers: 0 });
 
         var selectedProject = GetSelectedProject();
         var isRunning = selectedProject != null && ExecutionService.Instance.IsRunning(selectedProject.Path);
 
-        yield return new KeyBinding("r", isRunning ? "re-run" : "run", DoRun, k => k.KeyChar == 'r');
+        yield return new KeyBinding("r", isRunning ? "re-run" : "run", DoRun, k => k is { KeyChar: 'r', Modifiers: 0 });
 
         if (isRunning)
         {
-            yield return new KeyBinding("s", "stop", DoStop, k => k.KeyChar == 's');
+            yield return new KeyBinding("s", "stop", DoStop, k => k is { KeyChar: 's', Modifiers: 0 });
         }
     }
 
     private static bool MatchUpKey(ConsoleKeyInfo k) =>
-        k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.K || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P };
+        k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P };
 
     private static bool MatchDownKey(ConsoleKeyInfo k) =>
-        k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.J || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N };
+        k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N };
 
     private static bool MatchLeftKey(ConsoleKeyInfo k) =>
-        k.Key == ConsoleKey.LeftArrow || k.Key == ConsoleKey.H;
+        k is { Key: ConsoleKey.LeftArrow or ConsoleKey.H, Modifiers: 0 };
 
     private static bool MatchRightKey(ConsoleKeyInfo k) =>
-        k.Key == ConsoleKey.RightArrow || k.Key == ConsoleKey.L;
+        k is { Key: ConsoleKey.RightArrow or ConsoleKey.L, Modifiers: 0 };
 
     private static bool MatchPageUpKey(ConsoleKeyInfo k) =>
-        k.Key == ConsoleKey.PageUp || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U };
+        k is { Key: ConsoleKey.PageUp, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U };
 
     private static bool MatchPageDownKey(ConsoleKeyInfo k) =>
-        k.Key == ConsoleKey.PageDown || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D };
+        k is { Key: ConsoleKey.PageDown, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D };
 
     private Task DoMoveUp() { MoveUp(); return Task.CompletedTask; }
     private Task DoMoveDown() { MoveDown(); return Task.CompletedTask; }

@@ -157,13 +157,13 @@ public class ProjectDetailsPane : IKeyBindable, ISearchable
         {
             NextTab();
             return Task.CompletedTask;
-        }, k => k.KeyChar == ']' || k.Key == ConsoleKey.Tab, false);
+        }, k => k.KeyChar == ']' || k is { Key: ConsoleKey.Tab, Modifiers: 0 }, false);
 
         yield return new KeyBinding("/", "search", () =>
         {
             OnSearchRequested?.Invoke();
             return Task.CompletedTask;
-        }, k => k.KeyChar == '/');
+        }, k => k is { KeyChar: '/', Modifiers: 0 });
 
         var activeTab = _tabInstances[_tabs.ActiveTab];
         foreach (var b in activeTab.GetKeyBindings())

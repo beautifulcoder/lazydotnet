@@ -27,27 +27,27 @@ public class ProjectReferencesTab(SolutionService solutionService, IEditorServic
         {
             MoveUp();
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.K || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P }, false);
+        }, k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P }, false);
 
         yield return new KeyBinding("j/↓/ctrl+n", "down", () =>
         {
             MoveDown();
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.J || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N }, false);
+        }, k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N }, false);
 
         yield return new KeyBinding("pgup/ctrl+u", "page up", () =>
         {
             PageUp(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageUp || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U }, false);
+        }, k => k is { Key: ConsoleKey.PageUp, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U }, false);
 
         yield return new KeyBinding("pgdn/ctrl+d", "page down", () =>
         {
             PageDown(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageDown || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D }, false);
+        }, k => k is { Key: ConsoleKey.PageDown, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D }, false);
 
-        yield return new KeyBinding("a", "add", AddReferenceAsync, k => k.Key == ConsoleKey.A);
+        yield return new KeyBinding("a", "add", AddReferenceAsync, k => k is { Key: ConsoleKey.A, Modifiers: 0 });
 
         if (_refsList.SelectedItem != null)
         {
@@ -55,9 +55,9 @@ public class ProjectReferencesTab(SolutionService solutionService, IEditorServic
             {
                 RequestSelectProject?.Invoke(_refsList.SelectedItem);
                 return Task.CompletedTask;
-            }, k => k.Key == ConsoleKey.Enter);
-            yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k.Key == ConsoleKey.E);
-            yield return new KeyBinding("d", "delete", RemoveReferenceAsync, k => k.Key == ConsoleKey.D);
+            }, k => k is { Key: ConsoleKey.Enter, Modifiers: 0 });
+            yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k is { Key: ConsoleKey.E, Modifiers: 0 });
+            yield return new KeyBinding("d", "delete", RemoveReferenceAsync, k => k is { Key: ConsoleKey.D, Modifiers: 0 });
         }
     }
 

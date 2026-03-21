@@ -254,7 +254,7 @@ public class NuGetDetailsTab : IProjectTab, ISearchable
             MoveUp();
             return Task.CompletedTask;
         },
-        k => k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.K ||
+        k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } ||
              k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.P }, false);
 
         yield return new KeyBinding("j/↓/ctrl+n", "down", () =>
@@ -262,7 +262,7 @@ public class NuGetDetailsTab : IProjectTab, ISearchable
             MoveDown();
             return Task.CompletedTask;
         },
-        k => k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.J ||
+        k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } ||
              k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.N }, false);
 
         yield return new KeyBinding("pgup/ctrl+u", "page up", () =>
@@ -270,14 +270,14 @@ public class NuGetDetailsTab : IProjectTab, ISearchable
             lock (_lock) { _nugetList.PageUp(10); }
             return Task.CompletedTask;
         },
-        k => k.Key == ConsoleKey.PageUp || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U }, false);
+        k => k is { Key: ConsoleKey.PageUp, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.U }, false);
 
         yield return new KeyBinding("pgdn/ctrl+d", "page down", () =>
         {
             lock (_lock) { _nugetList.PageDown(10); }
             return Task.CompletedTask;
         },
-        k => k.Key == ConsoleKey.PageDown || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D }, false);
+        k => k is { Key: ConsoleKey.PageDown, Modifiers: 0 } || k is { Modifiers: ConsoleModifiers.Control, Key: ConsoleKey.D }, false);
     }
 
     private IEnumerable<KeyBinding> GetActionBindings()
@@ -312,7 +312,7 @@ public class NuGetDetailsTab : IProjectTab, ISearchable
             );
             RequestModal?.Invoke(modal);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.A);
+        }, k => k is { Key: ConsoleKey.A, Modifiers: 0 });
     }
 
     private IEnumerable<KeyBinding> GetSelectedItemBindings(bool isSolution)
@@ -350,7 +350,7 @@ public class NuGetDetailsTab : IProjectTab, ISearchable
 
             RequestModal?.Invoke(confirm);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.D);
+        }, k => k is { Key: ConsoleKey.D, Modifiers: 0 });
     }
 
     private KeyBinding GetVersionsBinding(NuGetPackageInfo pkg)

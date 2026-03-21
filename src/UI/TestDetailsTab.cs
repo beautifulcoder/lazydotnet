@@ -139,7 +139,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
 
         foreach (var b in GetNavigationBindings()) yield return b;
 
-        yield return new KeyBinding("f", "filter", CycleFilterAsync, k => k.Key == ConsoleKey.F);
+        yield return new KeyBinding("f", "filter", CycleFilterAsync, k => k is { Key: ConsoleKey.F, Modifiers: 0 });
 
         if (_visibleNodes.Count == 0) yield break;
 
@@ -149,8 +149,8 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
         yield return GetCollapseBinding(node);
         yield return GetToggleBinding(node);
         yield return GetDetailsBinding(node);
-        yield return new KeyBinding("r", "run", () => RunSelectedTestAsync(node), k => k.Key == ConsoleKey.R);
-        yield return new KeyBinding("e", "edit", () => OpenInEditorAsync(node), k => k.Key == ConsoleKey.E);
+        yield return new KeyBinding("r", "run", () => RunSelectedTestAsync(node), k => k is { Key: ConsoleKey.R, Modifiers: 0 });
+        yield return new KeyBinding("e", "edit", () => OpenInEditorAsync(node), k => k is { Key: ConsoleKey.E, Modifiers: 0 });
     }
 
     private IEnumerable<KeyBinding> GetNavigationBindings()
@@ -159,25 +159,25 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
         {
             MoveUp();
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.UpArrow || k.Key == ConsoleKey.K || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.P), false);
+        }, k => k is { Key: ConsoleKey.UpArrow or ConsoleKey.K, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.P), false);
 
         yield return new KeyBinding("j/↓/ctrl+n", "down", () =>
         {
             MoveDown();
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.DownArrow || k.Key == ConsoleKey.J || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.N), false);
+        }, k => k is { Key: ConsoleKey.DownArrow or ConsoleKey.J, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.N), false);
 
         yield return new KeyBinding("pgup/ctrl+u", "page up", () =>
         {
             PageUp(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageUp || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.U), false);
+        }, k => k is { Key: ConsoleKey.PageUp, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.U), false);
 
         yield return new KeyBinding("pgdn/ctrl+d", "page down", () =>
         {
             PageDown(10);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.PageDown || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.D), false);
+        }, k => k is { Key: ConsoleKey.PageDown, Modifiers: 0 } || (k.Modifiers == ConsoleModifiers.Control && k.Key == ConsoleKey.D), false);
     }
 
     private KeyBinding GetExpandBinding(TestNode node)
@@ -193,7 +193,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
                 }
             }
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.RightArrow || k.Key == ConsoleKey.L, false);
+        }, k => k is { Key: ConsoleKey.RightArrow or ConsoleKey.L, Modifiers: 0 }, false);
     }
 
     private KeyBinding GetCollapseBinding(TestNode node)
@@ -224,7 +224,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
                 }
             }
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.LeftArrow || k.Key == ConsoleKey.H, false);
+        }, k => k is { Key: ConsoleKey.LeftArrow or ConsoleKey.H, Modifiers: 0 }, false);
     }
 
     private KeyBinding GetToggleBinding(TestNode node)
@@ -240,7 +240,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
                 }
             }
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.Spacebar, false);
+        }, k => k is { Key: ConsoleKey.Spacebar, Modifiers: 0 }, false);
     }
 
     private KeyBinding GetDetailsBinding(TestNode node)
@@ -249,7 +249,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
         {
             ShowTestDetails(node);
             return Task.CompletedTask;
-        }, k => k.Key == ConsoleKey.Enter, true);
+        }, k => k is { Key: ConsoleKey.Enter, Modifiers: 0 }, true);
     }
 
     private void ShowTestDetails(TestNode node)
@@ -261,7 +261,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
             modal.SetAdditionalKeyBindings([
                 new KeyBinding("e", "edit", async () => {
                     await editorService.OpenFileAsync(node.FilePath, node.LineNumber);
-                }, k => k.Key == ConsoleKey.E)
+                }, k => k is { Key: ConsoleKey.E, Modifiers: 0 })
             ]);
         }
 

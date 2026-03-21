@@ -284,13 +284,13 @@ public class DashboardScreen : IScreen
     private IEnumerable<KeyBinding> GetGlobalBindings()
     {
         yield return new KeyBinding("q", "quit", () => Task.FromResult<IScreen?>(null),
-            k => k.Key == ConsoleKey.Q);
+            k => k is { Key: ConsoleKey.Q, Modifiers: 0 });
         yield return new KeyBinding("tab", "next panel", () => Task.CompletedTask,
             k => k.Key == ConsoleKey.Tab && (k.Modifiers & ConsoleModifiers.Shift) == 0, false);
         yield return new KeyBinding("shift+tab", "prev panel", () => Task.CompletedTask,
             k => k.Key == ConsoleKey.Tab && (k.Modifiers & ConsoleModifiers.Shift) != 0, false);
         yield return new KeyBinding("0-3", "switch panel", () => Task.CompletedTask,
-            k => k.Key is ConsoleKey.D0 or ConsoleKey.D1 or ConsoleKey.D2 or ConsoleKey.D3, false);
+            k => k is { Key: ConsoleKey.D0 or ConsoleKey.D1 or ConsoleKey.D2 or ConsoleKey.D3, Modifiers: 0 }, false);
         yield return new KeyBinding("B", "build solution", () => HandleBuildAsync(_layout, true),
             k => k.Key == ConsoleKey.B && (k.Modifiers & ConsoleModifiers.Shift) != 0);
         yield return new KeyBinding("S", "stop all projects", async () =>
@@ -306,7 +306,7 @@ public class DashboardScreen : IScreen
         {
             ShowHelpModal();
             return Task.CompletedTask;
-        }, k => k.KeyChar == '?');
+        }, k => k is { KeyChar: '?', Modifiers: 0 });
     }
 
     public void StartSearch()
