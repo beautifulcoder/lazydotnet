@@ -99,6 +99,11 @@ public class DashboardScreen : IScreen
             _layout.AddLog(result.ExitCode == 0
                 ? $"[green]Build Succeeded: {Markup.Escape(name)}[/]"
                 : $"[red]Build Failed: {Markup.Escape(name)}[/]");
+
+            if (result.ExitCode == 0)
+                Notification.Show("Build succeeded");
+            else
+                Notification.Show("Build failed", NotificationType.Error);
         }
         catch (Exception ex)
         {
@@ -643,6 +648,11 @@ public class DashboardScreen : IScreen
                 layout.AddLog(result.ExitCode == 0
                     ? $"[green]Build Succeeded: {Markup.Escape(targetName ?? "Unknown")}[/]"
                     : $"[red]Build Failed: {Markup.Escape(targetName ?? "Unknown")}[/]");
+
+                if (result.ExitCode == 0)
+                    Notification.Show("Build succeeded");
+                else
+                    Notification.Show("Build failed", NotificationType.Error);
 
                 _needsRefresh = true;
             }

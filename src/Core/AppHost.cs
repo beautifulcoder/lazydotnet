@@ -1,5 +1,6 @@
 using Spectre.Console;
 using lazydotnet.UI;
+using lazydotnet.UI.Components;
 using lazydotnet.Services;
 
 namespace lazydotnet.Core;
@@ -10,6 +11,7 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
     private readonly Lock _uiLock = new();
     private bool _isRunning = true;
     private string? _pendingLog;
+    private bool _hadNotification;
 
     public async Task RunAsync()
     {
@@ -21,7 +23,7 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
 
         AnsiConsole.AlternateScreen(() =>
         {
-            AnsiConsole.Live(layout.GetRoot())
+            AnsiConsole.Live(layout.GetRootWithNotification())
                 .StartAsync(async ctx =>
                 {
                     _currentScreen?.OnEnter();
@@ -63,21 +65,33 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
     private const int MinWidth = 20;
     private const int MinHeight = 5;
 
-    private async Task ProcessTickAsync(LiveDisplayContext ctx)
+    private void HandlePendingLog(LiveDisplayContext ctx)
     {
         var pendingLog = Interlocked.Exchange(ref _pendingLog, null);
-        if (pendingLog is not null)
+        if (pendingLog is null) return;
+
+        lock (_uiLock)
         {
-            lock (_uiLock)
-            {
-                layout.AddLog(pendingLog);
-                var h = AppLayout.GetBottomHeight(Console.WindowHeight);
-                layout.UpdateBottom(Console.WindowWidth, h);
-                if (_currentScreen is not null)
-                    layout.UpdateFooter(_currentScreen.GetKeyBindings());
-                ctx.Refresh();
-            }
+            layout.AddLog(pendingLog);
+            var h = AppLayout.GetBottomHeight(Console.WindowHeight);
+            layout.UpdateBottom(Console.WindowWidth, h);
+            if (_currentScreen is not null)
+                layout.UpdateFooter(_currentScreen.GetKeyBindings());
+            ctx.Refresh();
         }
+    }
+
+    private bool HandleNotificationExpiry()
+    {
+        var hasNotification = Notification.HasActiveNotification;
+        var expired = _hadNotification && !hasNotification;
+        _hadNotification = hasNotification;
+        return expired;
+    }
+
+    private async Task ProcessTickAsync(LiveDisplayContext ctx)
+    {
+        HandlePendingLog(ctx);
 
         var width = Console.WindowWidth;
         var height = Console.WindowHeight;
@@ -100,9 +114,10 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
             }
 
             if (_currentScreen!.OnTick())
-            {
                 needsRefresh = true;
-            }
+
+            if (HandleNotificationExpiry())
+                needsRefresh = true;
 
             while (Console.KeyAvailable)
             {

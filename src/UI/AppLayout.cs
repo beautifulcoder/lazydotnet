@@ -60,6 +60,11 @@ public class AppLayout
 
     public Layout GetRoot() => _rootLayout;
 
+    public IRenderable GetRootWithNotification()
+    {
+        return new NotificationOverlay(_rootLayout);
+    }
+
     public int ActivePanel { get; private set; } = 2;
 
     public void SetActivePanel(int panel)

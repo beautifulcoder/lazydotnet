@@ -265,10 +265,11 @@ public partial class LogViewer : IKeyBindable, ISearchable
         lock (_lock)
         {
             if (_logs.Count == 0) return;
+            if (!_isVisualMode && _selectedLogicalIndex == -1) return;
 
             var start = _isVisualMode 
                 ? Math.Min(_visualSelectionStart, _visualSelectionEnd)
-                : GetCurrentOrLastIndex();
+                : _selectedLogicalIndex;
             var end = _isVisualMode
                 ? Math.Max(_visualSelectionStart, _visualSelectionEnd)
                 : start;
@@ -276,12 +277,8 @@ public partial class LogViewer : IKeyBindable, ISearchable
             var selectedLogs = _logs.Skip(start).Take(end - start + 1).ToList();
             var text = string.Join(Environment.NewLine, selectedLogs);
             ClipboardService.SetText(Markup.Remove(text));
+            Notification.Show("Copied to clipboard");
         }
-    }
-
-    private int GetCurrentOrLastIndex()
-    {
-        return _selectedLogicalIndex == -1 ? _logs.Count - 1 : _selectedLogicalIndex;
     }
 
     private struct PhysicalLine

@@ -242,6 +242,17 @@ Search is available in some panels.
 | `c`       | Clear logs         |
 | `Esc`     | Resume auto-scroll |
 
+#### Log Panel
+
+| Key               | Action                             |
+| ----------------- | ---------------------------------- |
+| `j` / `k`         | Navigate log lines                 |
+| `Ctrl+D` / `PgDn` | Page down                          |
+| `Ctrl+U` / `PgUp` | Page up                            |
+| `v`               | Toggle visual selection            |
+| `y`               | Yank (copy) selection to clipboard |
+| `Esc`             | Resume auto-scroll                 |
+
 ## Configuration examples
 
 ### Zed Integration
