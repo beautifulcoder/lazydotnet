@@ -391,7 +391,7 @@ public class DashboardScreen : IScreen
 
         var allBindings = localBindings.Concat(globalBindings).ToList();
         var maxLabelWidth = allBindings.Select(b => b.Label.Length).DefaultIfEmpty(0).Max();
-        var maxDescWidth = allBindings.Select(b => b.Description.Length).DefaultIfEmpty(0).Max();
+        var maxDescWidth = allBindings.Select(b => (b.LongDescription ?? b.Description).Length).DefaultIfEmpty(0).Max();
 
         var maxHeaderWidth = Math.Max(panelName.Length, "Global".Length) + 8;
         maxDescWidth = Math.Max(maxDescWidth, maxHeaderWidth);
@@ -421,7 +421,8 @@ public class DashboardScreen : IScreen
 
             foreach (var b in bindings)
             {
-                grid.AddRow(new Markup($"[blue]{Markup.Escape(b.Label)}[/]"), new Markup(Markup.Escape(b.Description)));
+                var desc = b.LongDescription ?? b.Description;
+                grid.AddRow(new Markup($"[blue]{Markup.Escape(b.Label)}[/]"), new Markup(Markup.Escape(desc)));
             }
 
             grid.AddRow(Text.Empty, Text.Empty);

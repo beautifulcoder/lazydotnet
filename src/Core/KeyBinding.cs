@@ -5,7 +5,8 @@ public record KeyBinding(
     string Description,
     Func<Task> Action,
     Func<ConsoleKeyInfo, bool> Match,
-    bool ShowInBottomBar = true
+    bool ShowInBottomBar = true,
+    string? LongDescription = null
 );
 
 public interface IKeyBindable

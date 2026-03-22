@@ -203,7 +203,7 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
         yield return new KeyBinding("h/←", "collapse", DoCollapse, MatchLeftKey, false);
         yield return new KeyBinding("l/→", "expand", DoExpand, MatchRightKey, false);
         yield return new KeyBinding("enter/space", "toggle", DoToggle, k => k is { Key: ConsoleKey.Enter or ConsoleKey.Spacebar, Modifiers: 0 }, false);
-        yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k is { Key: ConsoleKey.E, Modifiers: 0 });
+        yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k is { Key: ConsoleKey.E, Modifiers: 0 }, LongDescription: "open file in editor");
         yield return new KeyBinding("b", "build", DoBuild, k => k is { KeyChar: 'b', Modifiers: 0 });
         yield return new KeyBinding("/", "search", DoStartSearch, k => k is { KeyChar: '/', Modifiers: 0 });
 

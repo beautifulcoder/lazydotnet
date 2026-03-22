@@ -56,7 +56,7 @@ public class ProjectReferencesTab(SolutionService solutionService, IEditorServic
                 RequestSelectProject?.Invoke(_refsList.SelectedItem);
                 return Task.CompletedTask;
             }, k => k is { Key: ConsoleKey.Enter, Modifiers: 0 });
-            yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k is { Key: ConsoleKey.E, Modifiers: 0 });
+            yield return new KeyBinding("e", "edit", OpenInEditorAsync, k => k is { Key: ConsoleKey.E, Modifiers: 0 }, LongDescription: "open file in editor");
             yield return new KeyBinding("d", "delete", RemoveReferenceAsync, k => k is { Key: ConsoleKey.D, Modifiers: 0 });
         }
     }
