@@ -22,6 +22,10 @@ public sealed class DefaultSettings : CommandSettings
     [Description("The solution file (.sln, .slnx, .slnf) to open.")]
     public string? Solution { get; init; }
 
+    [CommandOption("-v|--version")]
+    [Description("Show version information.")]
+    public bool Version { get; init; }
+
     public override ValidationResult Validate()
     {
         if (!string.IsNullOrEmpty(Path))
@@ -68,6 +72,13 @@ public sealed class DefaultCommand : AsyncCommand<DefaultSettings>
 {
     public override async Task<int> ExecuteAsync(CommandContext context, DefaultSettings settings, CancellationToken cancellationToken)
     {
+        if (settings.Version)
+        {
+            const string rawVersion = ThisAssembly.Info.InformationalVersion;
+            var version = rawVersion.Contains('+') ? rawVersion.Split('+')[0] : rawVersion;
+            Console.WriteLine(version);
+            return 0;
+        }
         var rootDir = Directory.GetCurrentDirectory();
         string? solutionFile = null;
 
@@ -99,12 +110,12 @@ public sealed class DefaultCommand : AsyncCommand<DefaultSettings>
         var explorer = new SolutionExplorer(editorService);
 
         var dashboard = new DashboardScreen(explorer, detailsPane, layout, solutionService, rootDir, solutionFile);
-        explorer.OnSearchRequested += () => dashboard.StartSearch();
-        detailsPane.OnSearchRequested += () => dashboard.StartSearch();
-        layout.SetLogViewerSearchCallback(() => dashboard.StartSearch());
+        explorer.OnSearchRequested += dashboard.StartSearch;
+        detailsPane.OnSearchRequested += dashboard.StartSearch;
+        layout.SetLogViewerSearchCallback(dashboard.StartSearch);
         var host = new AppHost(layout, dashboard);
 
-        AppCli.OnLog += msg => host.Log(msg);
+        AppCli.OnLog += host.Log;
         _ = UpdateCheckerService.StartFireAndForgetCheckAsync();
 
         try
