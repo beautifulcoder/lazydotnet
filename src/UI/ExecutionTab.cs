@@ -273,8 +273,9 @@ public class ExecutionTab : IProjectTab
 
             if (first != -1)
             {
-                if (first < _scrollOffset) _scrollOffset = first;
-                if (last >= _scrollOffset + visibleRows) _scrollOffset = last - visibleRows + 1;
+                const int margin = 2;
+                if (first < _scrollOffset + margin) _scrollOffset = Math.Max(0, first - margin);
+                if (last >= _scrollOffset + visibleRows - margin) _scrollOffset = last - visibleRows + margin + 1;
             }
         }
 

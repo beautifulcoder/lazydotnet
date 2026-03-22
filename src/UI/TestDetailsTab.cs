@@ -216,9 +216,9 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
                     if (idx != -1)
                     {
                         _selectedIndex = idx;
-                        if (_selectedIndex < _scrollOffset)
+                        if (_selectedIndex < _scrollOffset + 2)
                         {
-                            _scrollOffset = _selectedIndex;
+                            _scrollOffset = Math.Max(0, _selectedIndex - 2);
                         }
                     }
                 }
@@ -280,7 +280,7 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
                 case > 0:
                 {
                     _selectedIndex--;
-                    if (_selectedIndex < _scrollOffset) _scrollOffset = _selectedIndex;
+                    if (_selectedIndex < _scrollOffset + 2) _scrollOffset = Math.Max(0, _selectedIndex - 2);
                     break;
                 }
             }
@@ -350,8 +350,9 @@ public class TestDetailsTab(IEditorService editorService) : IProjectTab, ISearch
             return;
         }
 
-        if (_selectedIndex < _scrollOffset) _scrollOffset = _selectedIndex;
-        if (_selectedIndex >= _scrollOffset + contentHeight) _scrollOffset = _selectedIndex - contentHeight + 1;
+        const int margin = 2;
+        if (_selectedIndex < _scrollOffset + margin) _scrollOffset = Math.Max(0, _selectedIndex - margin);
+        if (_selectedIndex >= _scrollOffset + contentHeight - margin) _scrollOffset = _selectedIndex - contentHeight + margin + 1;
 
         if (_scrollOffset < 0) _scrollOffset = 0;
     }

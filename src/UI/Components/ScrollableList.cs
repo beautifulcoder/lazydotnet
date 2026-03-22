@@ -77,13 +77,13 @@ public class ScrollableList<T>
             return;
         }
 
-        if (SelectedIndex < ScrollOffset)
-            ScrollOffset = SelectedIndex;
+        const int margin = 2;
 
+        if (SelectedIndex < ScrollOffset + margin)
+            ScrollOffset = Math.Max(0, SelectedIndex - margin);
 
-        if (SelectedIndex >= ScrollOffset + visibleRows)
-            ScrollOffset = SelectedIndex - visibleRows + 1;
-
+        if (SelectedIndex >= ScrollOffset + visibleRows - margin)
+            ScrollOffset = SelectedIndex - visibleRows + margin + 1;
 
         if (ScrollOffset < 0) ScrollOffset = 0;
         var maxOffset = Math.Max(0, _items.Count - visibleRows);

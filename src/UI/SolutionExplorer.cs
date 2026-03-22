@@ -322,8 +322,8 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
         if (_selectedIndex <= 0)
             return;
         _selectedIndex--;
-        if (_selectedIndex < _scrollOffset)
-            _scrollOffset = _selectedIndex;
+        if (_selectedIndex < _scrollOffset + 2)
+            _scrollOffset = Math.Max(0, _selectedIndex - 2);
     }
 
     private void MoveDown()
@@ -397,13 +397,15 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
             return;
         }
 
-        if (_selectedIndex < _scrollOffset)
+        const int margin = 2;
+
+        if (_selectedIndex < _scrollOffset + margin)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = Math.Max(0, _selectedIndex - margin);
         }
-        else if (_selectedIndex >= _scrollOffset + contentHeight)
+        else if (_selectedIndex >= _scrollOffset + contentHeight - margin)
         {
-            _scrollOffset = _selectedIndex - contentHeight + 1;
+            _scrollOffset = _selectedIndex - contentHeight + margin + 1;
         }
 
         if (_scrollOffset > _visibleNodes.Count - contentHeight)
