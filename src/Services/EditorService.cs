@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using CliWrap;
+using lazydotnet.UI.Components;
 
 namespace lazydotnet.Services;
 
@@ -22,6 +22,14 @@ public class EditorService : IEditorService
 
     public async Task OpenFileAsync(string filePath, int? lineNumber = null)
     {
+        var vscodeOutputFile = Environment.GetEnvironmentVariable("LAZYDOTNET_VSCODE_IPC_FILE");
+        if (!string.IsNullOrEmpty(vscodeOutputFile))
+        {
+            var output = lineNumber.HasValue ? $"{filePath}\t{lineNumber}" : filePath;
+            await File.WriteAllTextAsync(vscodeOutputFile, output);
+            return;
+        }
+
         var (command, args) = GetEditorLaunchCommand(filePath, lineNumber);
 
         try
@@ -33,11 +41,13 @@ public class EditorService : IEditorService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Failed to open editor '{command}': {ex.Message}");
-
             if (command != "open" && OperatingSystem.IsMacOS())
             {
                 await Cli.Wrap("open").WithArguments(filePath).ExecuteAsync();
+            }
+            else
+            {
+                Notification.Show($"Failed to open editor: {ex.Message}", NotificationType.Error);
             }
         }
     }

@@ -2,6 +2,7 @@ using lazydotnet.Core;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using lazydotnet.Services;
+using lazydotnet.UI.Components;
 
 namespace lazydotnet.UI;
 
@@ -309,6 +310,10 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
         if (node.ProjectPath != null)
         {
             await editorService.OpenFileAsync(node.ProjectPath);
+        }
+        else
+        {
+            Notification.Show("No file to open for this item");
         }
     }
 
