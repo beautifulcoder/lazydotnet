@@ -12,6 +12,7 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
     private bool _isRunning = true;
     private string? _pendingLog;
     private bool _hadNotification;
+    private volatile bool _suspended;
 
     public async Task RunAsync()
     {
@@ -31,24 +32,8 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
                     _lastWidth = Console.WindowWidth;
                     _lastHeight = Console.WindowHeight;
 
-                    layout.OnLog += () =>
-                    {
-                        try
-                        {
-                            lock (_uiLock)
-                            {
-                                var h = AppLayout.GetBottomHeight(Console.WindowHeight);
-                                layout.UpdateBottom(Console.WindowWidth, h);
-                                if (_currentScreen != null)
-                                    layout.UpdateFooter(_currentScreen.GetKeyBindings());
-                                ctx.Refresh();
-                            }
-                        }
-                        catch
-                        {
-                            // Silently ignore rendering errors
-                        }
-                    };
+                    TuiSuspender.SetHandler(action => SuspendUiAsync(ctx, action));
+                    layout.OnLog += () => OnLogPending(ctx);
 
                     while (_isRunning && _currentScreen != null)
                     {
@@ -56,6 +41,7 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
                     }
 
                     await ExecutionService.Instance.StopAllAsync();
+                    TuiSuspender.SetHandler(null);
                 }).GetAwaiter().GetResult();
         });
 
@@ -91,6 +77,12 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
 
     private async Task ProcessTickAsync(LiveDisplayContext ctx)
     {
+        if (_suspended)
+        {
+            await Task.Delay(50);
+            return;
+        }
+
         HandlePendingLog(ctx);
 
         var width = Console.WindowWidth;
@@ -165,5 +157,74 @@ public class AppHost(AppLayout layout, IScreen initialScreen)
     public void Log(string message)
     {
         Interlocked.Exchange(ref _pendingLog, message);
+    }
+
+    private void OnLogPending(LiveDisplayContext ctx)
+    {
+        try
+        {
+            lock (_uiLock)
+            {
+                if (_suspended) return;
+                var h = AppLayout.GetBottomHeight(Console.WindowHeight);
+                layout.UpdateBottom(Console.WindowWidth, h);
+                if (_currentScreen != null)
+                    layout.UpdateFooter(_currentScreen.GetKeyBindings());
+                ctx.Refresh();
+            }
+        }
+        catch
+        {
+            // Silently ignore rendering errors
+        }
+    }
+
+#pragma warning disable S6966
+    private async Task SuspendUiAsync(LiveDisplayContext ctx, Func<Task> action)
+    {
+        _suspended = true;
+
+        try
+        {
+            lock (_uiLock)
+            {
+                Console.Out.Write("\x1b[?1049l\x1b[?25h");
+                Console.Out.Flush();
+            }
+
+            await action();
+        }
+        finally
+        {
+            lock (_uiLock)
+            {
+                Console.Out.Write("\x1b[?1049h\x1b[?25l");
+                Console.Out.Flush();
+                _suspended = false;
+                ResumeRender(ctx);
+            }
+        }
+    }
+#pragma warning restore S6966
+
+    private void ResumeRender(LiveDisplayContext ctx)
+    {
+        try
+        {
+            var width = Console.WindowWidth;
+            var height = Console.WindowHeight;
+            _lastWidth = width;
+            _lastHeight = height;
+            _currentScreen?.Render(layout, width, height);
+            var bottomH = AppLayout.GetBottomHeight(height);
+            layout.UpdateBottom(width, bottomH);
+            if (_currentScreen != null)
+                layout.UpdateFooter(_currentScreen.GetKeyBindings());
+            ctx.Refresh();
+        }
+        catch
+        {
+            // Ignore rendering errors during resume
+        }
     }
 }

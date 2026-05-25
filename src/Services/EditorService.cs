@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using CliWrap;
+using lazydotnet.Core;
 using lazydotnet.UI.Components;
 
 namespace lazydotnet.Services;
@@ -20,6 +22,19 @@ public class EditorService : IEditorService
         ZedStyle
     }
 
+    private static readonly HashSet<string> TuiEditorNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "nvim", "vim", "vi", "helix", "hx", "nano", "micro", "pico", "emacs"
+    };
+
+    public static bool IsTuiEditor(string command)
+    {
+        if (string.IsNullOrWhiteSpace(command)) return false;
+        var firstToken = command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
+        var name = Path.GetFileNameWithoutExtension(firstToken);
+        return TuiEditorNames.Contains(name);
+    }
+
     public async Task OpenFileAsync(string filePath, int? lineNumber = null)
     {
         var vscodeOutputFile = Environment.GetEnvironmentVariable("LAZYDOTNET_VSCODE_IPC_FILE");
@@ -31,6 +46,12 @@ public class EditorService : IEditorService
         }
 
         var (command, args) = GetEditorLaunchCommand(filePath, lineNumber);
+
+        if (IsTuiEditor(command))
+        {
+            await TuiSuspender.RunAsync(() => RunTuiEditorAsync(command, args));
+            return;
+        }
 
         try
         {
@@ -49,6 +70,33 @@ public class EditorService : IEditorService
             {
                 Notification.Show($"Failed to open editor: {ex.Message}", NotificationType.Error);
             }
+        }
+    }
+
+    private static async Task RunTuiEditorAsync(string command, List<string> args)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo(command)
+            {
+                UseShellExecute = false,
+                RedirectStandardInput = false,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false
+            };
+            foreach (var a in args) psi.ArgumentList.Add(a);
+
+            using var process = Process.Start(psi);
+            if (process == null)
+            {
+                Notification.Show($"Failed to spawn editor: {command}", NotificationType.Error);
+                return;
+            }
+            await process.WaitForExitAsync();
+        }
+        catch (Exception ex)
+        {
+            Notification.Show($"Editor crashed: {ex.Message}", NotificationType.Error);
         }
     }
 
