@@ -483,3 +483,8 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 .lazydotnet/
+
+# Nix build output
+result
+result-*
+.direnv/

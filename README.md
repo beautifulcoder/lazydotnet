@@ -26,6 +26,17 @@ To update to the latest version:
 dotnet tool update --global lazydotnet
 ```
 
+### Nix (flake)
+
+```bash
+nix profile install github:ckob/lazydotnet
+# or run one-shot
+nix run github:ckob/lazydotnet
+```
+
+See [`nix/README.md`](nix/README.md) for the dev shell and for regenerating
+`deps.json` after changing NuGet references.
+
 ### Optional Dependencies
 
 For the NuGet package update features (checking for outdated packages and updating all packages), install [dotnet-outdated](https://github.com/dotnet-outdated/dotnet-outdated):
