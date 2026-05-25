@@ -19,12 +19,21 @@ public class EditorService : IEditorService
     private enum EditorType
     {
         VsCodeStyle,
-        ZedStyle
+        ZedStyle,
+        VimStyle
     }
 
-    private static readonly HashSet<string> TuiEditorNames = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, EditorType> TuiEditorTypes = new(StringComparer.OrdinalIgnoreCase)
     {
-        "nvim", "vim", "vi", "helix", "hx", "nano", "micro", "pico", "emacs"
+        ["nvim"] = EditorType.VimStyle,
+        ["vim"] = EditorType.VimStyle,
+        ["vi"] = EditorType.VimStyle,
+        ["nano"] = EditorType.VimStyle,
+        ["pico"] = EditorType.VimStyle,
+        ["emacs"] = EditorType.VimStyle,
+        ["micro"] = EditorType.VimStyle,
+        ["hx"] = EditorType.ZedStyle,
+        ["helix"] = EditorType.ZedStyle
     };
 
     public static bool IsTuiEditor(string command)
@@ -32,7 +41,7 @@ public class EditorService : IEditorService
         if (string.IsNullOrWhiteSpace(command)) return false;
         var firstToken = command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
         var name = Path.GetFileNameWithoutExtension(firstToken);
-        return TuiEditorNames.Contains(name);
+        return TuiEditorTypes.ContainsKey(name);
     }
 
     public async Task OpenFileAsync(string filePath, int? lineNumber = null)
@@ -119,12 +128,24 @@ public class EditorService : IEditorService
             case EditorType.ZedStyle:
                 args.AddRange(GetZedStyleArgs(filePath, lineNumber));
                 break;
+            case EditorType.VimStyle:
+                args.AddRange(GetVimStyleArgs(filePath, lineNumber));
+                break;
             default:
                 args.Add(lineNumber.HasValue ? $"{filePath}:{lineNumber}" : filePath);
                 break;
         }
 
         return (command, args);
+    }
+
+    private static IEnumerable<string> GetVimStyleArgs(string filePath, int? lineNumber)
+    {
+        if (lineNumber.HasValue)
+        {
+            yield return $"+{lineNumber}";
+        }
+        yield return filePath;
     }
 
     private static IEnumerable<string> GetVsCodeStyleArgs(string filePath, int? lineNumber)
@@ -185,6 +206,14 @@ public class EditorService : IEditorService
         {
             return (editor, EditorType.ZedStyle);
         }
+
+        var firstToken = editor.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
+        var binaryName = Path.GetFileNameWithoutExtension(firstToken);
+        if (TuiEditorTypes.TryGetValue(binaryName, out var tuiType))
+        {
+            return (editor, tuiType);
+        }
+
         return (editor, null);
     }
 }
