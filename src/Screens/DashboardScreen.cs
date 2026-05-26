@@ -311,7 +311,7 @@ public class DashboardScreen : IScreen
         {
             ShowHelpModal();
             return Task.CompletedTask;
-        }, k => k is { KeyChar: '?', Modifiers: 0 });
+        }, k => k.KeyChar == '?');
     }
 
     public void StartSearch()
