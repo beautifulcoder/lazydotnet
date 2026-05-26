@@ -60,7 +60,5 @@ Then commit `nix/deps.json`.
 
 - The flake prefers `dotnet-sdk_10_0` from nixpkgs and falls back to 9.0 if 10
   is not yet packaged in the channel you track.
-- `BrokenDemoTests` are excluded from `doCheck` since they exist only to
-  populate the `TestDetailsModal` UI demo with failing tests.
 - The package is a global tool (`PackAsTool=true`). The flake outputs a single
   executable at `$out/bin/lazydotnet`.

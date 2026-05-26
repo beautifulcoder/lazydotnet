@@ -41,9 +41,6 @@
 
           # Skip integration tests at build time (require external test binaries)
           doCheck = true;
-          disabledTests = [
-            "lazydotnet.UnitTests.BrokenDemoTests"
-          ];
 
           meta = with pkgs.lib; {
             description = "Terminal UI for .NET solutions, inspired by lazygit";

@@ -16,6 +16,8 @@ public class EditorService : IEditorService
 {
     public string? RootPath { get; set; }
 
+    private sealed record EditorCommand(string Command, List<string> PrefixArgs);
+
     private enum EditorType
     {
         VsCodeStyle,
@@ -39,8 +41,8 @@ public class EditorService : IEditorService
     public static bool IsTuiEditor(string command)
     {
         if (string.IsNullOrWhiteSpace(command)) return false;
-        var firstToken = command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
-        var name = Path.GetFileNameWithoutExtension(firstToken);
+        var parsed = ParseEditorCommand(command);
+        var name = Path.GetFileNameWithoutExtension(parsed.Command);
         return TuiEditorTypes.ContainsKey(name);
     }
 
@@ -111,8 +113,9 @@ public class EditorService : IEditorService
 
     public (string Command, List<string> Args) GetEditorLaunchCommand(string filePath, int? lineNumber = null)
     {
-        var (command, type) = GetEditorInfo();
-        var args = new List<string>();
+        var (editor, type) = GetEditorInfo();
+        var parsed = ParseEditorCommand(editor);
+        var args = new List<string>(parsed.PrefixArgs);
 
         if (type is EditorType.VsCodeStyle or EditorType.ZedStyle)
         {
@@ -136,7 +139,7 @@ public class EditorService : IEditorService
                 break;
         }
 
-        return (command, args);
+        return (parsed.Command, args);
     }
 
     private static IEnumerable<string> GetVimStyleArgs(string filePath, int? lineNumber)
@@ -207,13 +210,94 @@ public class EditorService : IEditorService
             return (editor, EditorType.ZedStyle);
         }
 
-        var firstToken = editor.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
-        var binaryName = Path.GetFileNameWithoutExtension(firstToken);
+        var parsed = ParseEditorCommand(editor);
+        var binaryName = Path.GetFileNameWithoutExtension(parsed.Command);
         if (TuiEditorTypes.TryGetValue(binaryName, out var tuiType))
         {
             return (editor, tuiType);
         }
 
         return (editor, null);
+    }
+
+    private static EditorCommand ParseEditorCommand(string command)
+    {
+        var tokens = SplitCommandLine(command);
+        if (tokens.Count == 0)
+        {
+            return new EditorCommand(command, []);
+        }
+        return new EditorCommand(tokens[0], tokens.Skip(1).ToList());
+    }
+
+    private static List<string> SplitCommandLine(string command)
+    {
+        var tokens = new List<string>();
+        var current = new System.Text.StringBuilder();
+        char? quote = null;
+        var escaping = false;
+
+        foreach (var c in command)
+        {
+            if (escaping)
+            {
+                current.Append(c);
+                escaping = false;
+                continue;
+            }
+
+            if (c == '\\')
+            {
+                escaping = true;
+                continue;
+            }
+
+            if (TryHandleQuotedChar(c, current, ref quote)) continue;
+            if (TryHandleTokenBoundary(c, current, tokens)) continue;
+            current.Append(c);
+        }
+
+        if (escaping)
+        {
+            current.Append('\\');
+        }
+
+        if (current.Length > 0)
+        {
+            tokens.Add(current.ToString());
+        }
+
+        return tokens;
+    }
+
+    private static bool TryHandleQuotedChar(char c, System.Text.StringBuilder current, ref char? quote)
+    {
+        if (quote.HasValue)
+        {
+            if (c == quote.Value)
+            {
+                quote = null;
+            }
+            else
+            {
+                current.Append(c);
+            }
+            return true;
+        }
+
+        if (c is not ('\'' or '"')) return false;
+        quote = c;
+        return true;
+    }
+
+    private static bool TryHandleTokenBoundary(char c, System.Text.StringBuilder current, List<string> tokens)
+    {
+        if (!char.IsWhiteSpace(c)) return false;
+        if (current.Length > 0)
+        {
+            tokens.Add(current.ToString());
+            current.Clear();
+        }
+        return true;
     }
 }

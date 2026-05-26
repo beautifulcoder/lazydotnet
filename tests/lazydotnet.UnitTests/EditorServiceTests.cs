@@ -96,6 +96,56 @@ public class EditorServiceTests
     }
 
     [Fact]
+    public void GetEditorLaunchCommand_VimStyleEditor_WithEditorArgs_PreservesPrefixArgs()
+    {
+        var original = Environment.GetEnvironmentVariable("EDITOR");
+        try
+        {
+            Environment.SetEnvironmentVariable("EDITOR", "nvim -u NONE");
+            Environment.SetEnvironmentVariable("TERM_PROGRAM", null);
+            Environment.SetEnvironmentVariable("ZED_TERM", null);
+            Environment.SetEnvironmentVariable("CURSOR_CLI", null);
+            Environment.SetEnvironmentVariable("CURSOR_AGENT", null);
+            Environment.SetEnvironmentVariable("ANTIGRAVITY_CLI_ALIAS", null);
+
+            var service = new EditorService();
+            var (command, args) = service.GetEditorLaunchCommand("/path/file.cs", 42);
+
+            command.Should().Be("nvim");
+            args.Should().Equal("-u", "NONE", "+42", "/path/file.cs");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("EDITOR", original);
+        }
+    }
+
+    [Fact]
+    public void GetEditorLaunchCommand_QuotedEditorArgs_PreservesGroupedArg()
+    {
+        var original = Environment.GetEnvironmentVariable("EDITOR");
+        try
+        {
+            Environment.SetEnvironmentVariable("EDITOR", "nvim --cmd \"set number\"");
+            Environment.SetEnvironmentVariable("TERM_PROGRAM", null);
+            Environment.SetEnvironmentVariable("ZED_TERM", null);
+            Environment.SetEnvironmentVariable("CURSOR_CLI", null);
+            Environment.SetEnvironmentVariable("CURSOR_AGENT", null);
+            Environment.SetEnvironmentVariable("ANTIGRAVITY_CLI_ALIAS", null);
+
+            var service = new EditorService();
+            var (command, args) = service.GetEditorLaunchCommand("/path/file.cs", 42);
+
+            command.Should().Be("nvim");
+            args.Should().Equal("--cmd", "set number", "+42", "/path/file.cs");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("EDITOR", original);
+        }
+    }
+
+    [Fact]
     public void GetEditorLaunchCommand_VimStyleEditor_NoLine_OmitsPlusFlag()
     {
         var original = Environment.GetEnvironmentVariable("EDITOR");
