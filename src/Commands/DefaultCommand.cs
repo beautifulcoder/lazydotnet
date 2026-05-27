@@ -70,7 +70,7 @@ public sealed class DefaultSettings : CommandSettings
 
 public sealed class DefaultCommand : AsyncCommand<DefaultSettings>
 {
-    public override async Task<int> ExecuteAsync(CommandContext context, DefaultSettings settings, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, DefaultSettings settings, CancellationToken cancellationToken)
     {
         if (settings.Version)
         {
