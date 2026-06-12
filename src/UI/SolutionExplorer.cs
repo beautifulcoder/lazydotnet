@@ -580,7 +580,7 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
             : HighlightMatch(name, _searchQuery);
 
         if (!isSelected)
-            return new Markup($"[white]{indent} {icon} {displayName}{runningStatus}[/]");
+            return new Markup($"{indent} {icon} {displayName}{runningStatus}");
 
         if (isActive)
         {
@@ -589,7 +589,7 @@ public class SolutionExplorer(IEditorService editorService, Action? onSearchRequ
 
         if (suppressHighlight)
         {
-            return new Markup($"[white]{indent} {icon} {displayName}{runningStatus}[/]");
+            return new Markup($"{indent} {icon} {displayName}{runningStatus}");
         }
 
         return new Markup($"{indent} [bold yellow]{icon} {displayName}[/]{runningStatus}");
