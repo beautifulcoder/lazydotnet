@@ -37,10 +37,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Spectre.Console" Version="0.56.0" />
+    <PackageReference Include="Spectre.Console" Version="0.57.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.55.0" />
     <PackageReference Include="TextCopy" Version="6.2.1" />
-    <PackageReference Include="StreamJsonRpc" Version="2.25.25" />
+    <PackageReference Include="StreamJsonRpc" Version="2.25.29" />
     <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
     <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.1.2" PrivateAssets="all" />
   </ItemGroup>
