@@ -91,7 +91,7 @@ public class TestDetailsModal(TestNode node, Action onClose) : Modal(node.Name, 
             else if (node.Status == TestStatus.Running)
                 lines.Add(new TestOutputLine("Test is currently running...", "yellow"));
             else
-                lines.Add(new TestOutputLine("Test has not been run yet.", "dim"));
+                lines.Add(new TestOutputLine("Test has not been run yet.", "grey"));
         }
 
         return lines;
